@@ -11,17 +11,31 @@ def removesStressPhonemes(speech):
 		result += line.replace("1", "").replace("0", "").replace("P", "").replace("\n", "")
 	return result
 
-def separateByWords(speech):
+def splitByUtterance(speech, noWord=False):
+	'''
+	Creates an array of utterances.
+	If no word (to form training data), removes word boundaries.
+	'''
+	if noWord:
+		speech = speech.replace("W", "")
+
+	result = speech.split("U")
+	result = list(filter(None, result))
+	return result
+
+def splitByWords(speech):
 	'''
 	Creates an array of an array of utterances separated by words.
 	utterance separated by 'U', words separated by 'W'
+
+	Input speech has not yet been split by utterances.
 	'''
 	totalLen = 0
 	count = 0
 
 	result = []
-	listOfUtterances = speech.split("U")
-	listOfUtterances = list(filter(None, listOfUtterances))
+	listOfUtterances = splitByUtterance(speech)
+	print(listOfUtterances)
 
 	for eachUtterance in listOfUtterances:
 		# rempves empty strings
@@ -38,10 +52,16 @@ def separateByWords(speech):
 if __name__ == '__main__':
 	speech_input = 'data/mother.speech.txt'
 	with open(speech_input, "r") as speech:
-		processedSpeech, avgLen = separateByWords(removesStressPhonemes(speech))
-		print(processedSpeech)
-		print(len(processedSpeech))
-		print(avgLen)
+		noStressSpeech = removesStressPhonemes(speech)
+		processedSpeech, avgLen = splitByWords(noStressSpeech)
 
-		with open('data/splitByWords.txt','a') as new_speech:
-			new_speech.write(str(processedSpeech))
+		## To generate statistics
+		# print(len(processedSpeech))
+		# print(avgLen)
+
+		# with open('data/splitByWords.txt','a') as new_speech:
+		# 	new_speech.write(str(processedSpeech))
+
+		# saveListOfUtterances = splitByUtterance(noStressSpeech, True)
+		# with open('data/splitByUtterance.txt','a') as new_speech:
+		# 	new_speech.write(str(saveListOfUtterances))
