@@ -1,4 +1,4 @@
-''' This files preprocesses the data. '''
+''' This file preprocesses the data. '''
 
 def removesStressPhonemes(speech):
 	'''
@@ -14,7 +14,7 @@ def removesStressPhonemes(speech):
 def splitByUtterance(speech, noWord=False):
 	'''
 	Creates an array of utterances.
-	If no word (to form training data), removes word boundaries.
+	If noword (to form training data), removes word boundaries.
 	'''
 	if noWord:
 		speech = speech.replace("W", "")
