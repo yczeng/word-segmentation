@@ -1,3 +1,4 @@
 spaces.py
 data/mother.speech.txt
 data/mother.speech.nostress.txt
+__pycache__
