@@ -8,7 +8,7 @@ def removesStressPhonemes(speech):
 	result = ""
 	for line in speech:
 		#removes stress and phonemes
-		result += line.replace("1", "").replace("0", "").replace("P", "").replace("\n", "")
+		result += line.replace("1", "").replace("0", "").replace("2", "").replace("P", "").replace("\n", "")
 	return result
 
 def splitByUtterance(speech, noWord=False):
@@ -62,6 +62,6 @@ if __name__ == '__main__':
 		# with open('data/splitByWords.txt','a') as new_speech:
 		# 	new_speech.write(str(processedSpeech))
 
-		# saveListOfUtterances = splitByUtterance(noStressSpeech, True)
-		# with open('data/splitByUtterance.txt','a') as new_speech:
-		# 	new_speech.write(str(saveListOfUtterances))
+		saveListOfUtterances = splitByUtterance(noStressSpeech, True)
+		with open('data/splitByUtterance.txt','a') as new_speech:
+			new_speech.write(str(saveListOfUtterances))
