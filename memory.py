@@ -12,8 +12,9 @@ def shortTermMemory(memoryLength, utteranceArray):
 		utteranceArray: an array of String utterances
 		memoryLength: an int for memory length
 	Returns:
-		Memory: list of utterances (which is a list of syllables)
-		Lexicon: list of words that have been segmented
+		memory: list of utterances (which is a list of syllables)
+		lexicon: a list of segmentations, either strings or lists of syllables
+		lexiconFrequency: a list of segmentations frequency
 
 	'''
 	memory = []
@@ -114,11 +115,11 @@ def forEachUtterance(utterance, memory=[], lexicon=[], lexiconFrequency=[]):
 			if (len(memory[memUttPointer]) - 1) > memSyllPointer:
 				memSyllPointer += 1
 				isInMiddleOfSyllable = True
+				newWord.append(syllable)
 			else:
 				newWord, lexicon, lexiconFrequency = insertIntoLexicon(newWord, lexicon, lexiconFrequency)
 				isInMiddleOfSyllable = False
 
-			newWord.append(syllable)
 			tmpMemory.append(syllable)
 
 	# at the end if newWord has not been added, add it
