@@ -27,10 +27,11 @@ def shortTermMemory(memoryLength, utteranceArray):
 def forEachUtterance(utterance, memory=[], lexicon=[], lexiconFrequency=[]):
 	newWord = []
 
-	# Updates both lexiconFrequency and lexicon
-	def insertIntoLexicon(newWord):
-		if len(newWord) >= 2:
+	def insertIntoLexicon(newWord, MONOSYLLABIC=False):
+		''' if len of newWord is >=2, then it adds it to the lexicon.
+		otherwise it resets newWord to []'''
 
+		if len(newWord) >= 2 or isinstance(newWord, str):
 			inLexicon = False
 
 			# if word already in lexicon, increase frequency
@@ -42,43 +43,80 @@ def forEachUtterance(utterance, memory=[], lexicon=[], lexiconFrequency=[]):
 			
 			if not(inLexicon):
 				lexicon.append(newWord)
-				# accounts for first time word showed up and matched word
-				lexiconFrequency.append(2)
+				if (isinstance(newWord, str)):
+					lexiconFrequency.append(1)
+				else:
+					# accounts for first time word showed up and matched word				
+					lexiconFrequency.append(2)
 				newWord = []
 
 		return newWord
 
 	# Adds monosyllabic words to lexicon
 	if len(utterance) == 1:
-		memory.append(utterance[0])
+		memory.append(utterance)
 		insertIntoLexicon(utterance[0])
 		return memory, lexicon, lexiconFrequency
 
-	memoryPointer = 0
-	for syllable in utterance:
-		if syllable not in memory:
-			memory.append(syllable)
-			memoryPointer = 0
-			newWord = insertIntoLexicon(newWord)
+	memoryUtterancePointer = 0
+	memorySyllablePointer = 0
+	tmpMemory = []
 
+	isInMiddleOfSyllable = False
+
+	for syllable in utterance:
+		
+		if (isInMiddleOfSyllable):
+			# print("THE NEXT SYLLABLE", memory[memoryUtterancePointer][memorySyllablePointer])
+			if (memory[memoryUtterancePointer][memorySyllablePointer] == syllable):
+				inMemory = True
+			else:
+				inMemory = False
+		else:
+			# check if syllable is in memory, stores location
+			inMemory = False
+			for memUttIndex, memoryUtterance in enumerate(memory):
+				for memSyllIndex, memorySyllable in enumerate(memoryUtterance):
+					if memorySyllable == syllable:
+						inMemory = True
+						# don't save these pointers unless it's the first time
+						# you want to use the old memory pointers
+						if len(newWord) == 0:
+							memoryUtterancePointer = memUttIndex
+							memorySyllablePointer = memSyllIndex
+						break
+				if inMemory:
+					break
+		
+		if not(inMemory):
+			tmpMemory.append(syllable)
+			memoryUtterancePointer = 0
+			memorySyllablePointer = 0
+			# this also resets newWord to []
+			newWord = insertIntoLexicon(newWord)
+			inMemory = False
 		else:
 			# first time this syllable has shown up
 			if len(newWord) == 0:
-				for i in range(len(memory)):
-					if memory[i] == syllable:
-						memoryPointer = i
-						newWord.append(syllable)
-						break;
+				newWord.append(syllable)
+				memorySyllablePointer += 1
+				isInMiddleOfSyllable = True
 
 			# check that the second syllable is same as second in memory
-			elif (memory[memoryPointer + 1] == syllable):
-				memoryPointer += 1
+			elif (len(memory[memoryUtterancePointer]) - 1) > memorySyllablePointer:
+				memorySyllablePointer += 1
+				newWord.append(syllable)
+				isInMiddleOfSyllable = True
+
+			# has reached the end
+			else:
 				newWord.append(syllable)
 
-			memory.append(syllable)
+			tmpMemory.append(syllable)
 
 	# at the end if newWord has not been added, add it
 	insertIntoLexicon(newWord)
+	memory.append(tmpMemory)
 			
 	return memory, lexicon, lexiconFrequency
 
