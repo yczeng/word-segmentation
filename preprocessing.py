@@ -34,34 +34,29 @@ def splitByWords(speech):
 	count = 0
 
 	result = []
-	listOfUtterances = splitByUtterance(speech)
-	print(listOfUtterances)
+	speech = speech.replace("U", "")
+	speechWords = list(filter(None, speech.split("W")))
+	
+	for word in speechWords:
+		processedWord = list(filter(None, word.split("S")))
+		if processedWord not in result:
+			result.append( processedWord )
 
-	for eachUtterance in listOfUtterances:
-		# rempves empty strings
-		tmpList = list(filter(None, eachUtterance.split("W")))
-		
-		result.append(tmpList)
-
-		# to return average length of utterances
-		totalLen += len(tmpList)
-		count += 1
-
-	return result, totalLen / count
+	return result
 
 if __name__ == '__main__':
 	speech_input = 'data/mother.speech.txt'
 	with open(speech_input, "r") as speech:
 		noStressSpeech = removesStressPhonemes(speech)
-		processedSpeech, avgLen = splitByWords(noStressSpeech)
+		processedSpeech = splitByWords(noStressSpeech)
 
 		## To generate statistics
 		# print(len(processedSpeech))
 		# print(avgLen)
 
-		# with open('data/splitByWords.txt','a') as new_speech:
-		# 	new_speech.write(str(processedSpeech))
+		with open('data/splitByWords.txt','a') as new_speech:
+			new_speech.write(str(processedSpeech))
 
-		saveListOfUtterances = splitByUtterance(noStressSpeech, True)
-		with open('data/splitByUtterance.txt','a') as new_speech:
-			new_speech.write(str(saveListOfUtterances))
+		# saveListOfUtterances = splitByUtterance(noStressSpeech, True)
+		# with open('data/splitByUtterance.txt','a') as new_speech:
+		# 	new_speech.write(str(saveListOfUtterances))
