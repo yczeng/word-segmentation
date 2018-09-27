@@ -24,6 +24,43 @@ def shortTermMemory(memoryLength, utteranceArray):
 
 	return memory, lexicon, lexiconFrequency
 
+def checkInMemory(memory, syllable):
+	''' checks memory for syllable '''
+	for memUttIndex, memoryUtterance in enumerate(memory):
+		for memSyllIndex, memorySyllable in enumerate(memoryUtterance):
+			if memorySyllable == syllable:
+
+				return True, memUttIndex, memSyllIndex
+
+	return False, None, None
+
+def insertIntoLexicon(newWord, lexicon, lexiconFrequency):
+	'''
+	if len of newWord is >=2 or is monsyllabic, then it adds it to the lexicon.
+	otherwise it resets newWord to []
+	'''
+
+	if len(newWord) >= 2 or isinstance(newWord, str):
+		inLexicon = False
+
+		# if word already in lexicon, increase frequency
+		for index, each in enumerate(lexicon):
+			if newWord == each:
+				lexiconFrequency[index] += 1
+				inLexicon = True
+				break
+		
+		if not(inLexicon):
+			lexicon.append(newWord)
+			if (isinstance(newWord, str)):
+				lexiconFrequency.append(1)
+			else:
+				# accounts for first time word showed up and matched word				
+				lexiconFrequency.append(2)
+			newWord = []
+
+	return newWord, lexicon, lexiconFrequency
+
 def forEachUtterance(utterance, memory=[], lexicon=[], lexiconFrequency=[]):
 	'''
 	This is a helper function for shortTermMemory
@@ -39,37 +76,13 @@ def forEachUtterance(utterance, memory=[], lexicon=[], lexiconFrequency=[]):
 		lexiconFrequency: a list of segmentations frequency
 	'''
 
-	def insertIntoLexicon(newWord):
-		'''
-		if len of newWord is >=2, then it adds it to the lexicon.
-		otherwise it resets newWord to []
-		'''
-
-		if len(newWord) >= 2 or isinstance(newWord, str):
-			inLexicon = False
-
-			# if word already in lexicon, increase frequency
-			for index, each in enumerate(lexicon):
-				if newWord == each:
-					lexiconFrequency[index] += 1
-					inLexicon = True
-					break
-			
-			if not(inLexicon):
-				lexicon.append(newWord)
-				if (isinstance(newWord, str)):
-					lexiconFrequency.append(1)
-				else:
-					# accounts for first time word showed up and matched word				
-					lexiconFrequency.append(2)
-				newWord = []
-
-		return newWord
+	#TODO: if the word matches with a one syllable word in memory, it doesn't try to match more words in a latter part of memory...
+	# maybe that's a good time to segment it?
 
 	# Adds monosyllabic words to lexicon
 	if len(utterance) == 1:
 		memory.append(utterance)
-		insertIntoLexicon(utterance[0])
+		newWord, lexicon, lexiconFrequency = insertIntoLexicon(utterance[0], lexicon, lexiconFrequency)
 		return memory, lexicon, lexiconFrequency
 
 	memUttPointer = 0
@@ -77,55 +90,39 @@ def forEachUtterance(utterance, memory=[], lexicon=[], lexiconFrequency=[]):
 	tmpMemory = []
 	newWord = []
 	isInMiddleOfSyllable = False
-
 	for syllable in utterance:
 		
 		if isInMiddleOfSyllable:
 			inMemory = memory[memUttPointer][memSyllPointer] == syllable
 		else:
 			# check if syllable is in memory, stores location
-			inMemory = False
-			for memUttIndex, memoryUtterance in enumerate(memory):
-				for memSyllIndex, memorySyllable in enumerate(memoryUtterance):
-					if memorySyllable == syllable:
-						inMemory = True
-						# don't save these pointers unless it's the first time
-						# you want to use the old memory pointers
-						if len(newWord) == 0:
-							memUttPointer = memUttIndex
-							memSyllPointer = memSyllIndex
-						break
-				if inMemory:
-					break
-		
+			checkMemoryResults = checkInMemory(memory, syllable)
+			inMemory = checkMemoryResults[0]
+
+			if len(newWord) == 0:
+				memUttPointer = checkMemoryResults[1]
+				memSyllPointer = checkMemoryResults[2]
+
 		if not(inMemory):
 			tmpMemory.append(syllable)
 			memUttPointer = 0
 			memSyllPointer = 0
 			# this also resets newWord to []
-			newWord = insertIntoLexicon(newWord)
+			newWord, lexicon, lexiconFrequency = insertIntoLexicon(newWord, lexicon, lexiconFrequency)
 			inMemory = False
 		else:
-			# first time this syllable has shown up
-			if len(newWord) == 0:
-				newWord.append(syllable)
+			if (len(memory[memUttPointer]) - 1) > memSyllPointer:
 				memSyllPointer += 1
 				isInMiddleOfSyllable = True
-
-			# check that the second syllable is same as second in memory
-			elif (len(memory[memUttPointer]) - 1) > memSyllPointer:
-				memSyllPointer += 1
-				newWord.append(syllable)
-				isInMiddleOfSyllable = True
-
-			# has reached the end
 			else:
-				newWord.append(syllable)
+				isInMiddleOfSyllable = False
+				newWord, lexicon, lexiconFrequency = insertIntoLexicon(newWord, lexicon, lexiconFrequency)
 
+			newWord.append(syllable)
 			tmpMemory.append(syllable)
 
 	# at the end if newWord has not been added, add it
-	insertIntoLexicon(newWord)
+	newWord, lexicon, lexiconFrequency = insertIntoLexicon(newWord, lexicon, lexiconFrequency)
 	memory.append(tmpMemory)
 			
 	return memory, lexicon, lexiconFrequency
