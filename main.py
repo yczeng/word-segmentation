@@ -16,6 +16,7 @@ if __name__ == '__main__':
 
 			result = memory.shortTermMemory(50, utterances)
 			# print(result)
+			print(result[0])
 			print(result[1])
 			print(result[2])
 

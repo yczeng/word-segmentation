@@ -27,11 +27,13 @@ def shortTermMemory(memoryLength, utteranceArray):
 def forEachUtterance(utterance, memory=[], lexicon=[], lexiconFrequency=[]):
 	newWord = []
 
+	# Updates both lexiconFrequency and lexicon
 	def insertIntoLexicon(newWord):
-		# Updates both lexiconFrequency and lexicon
 		if len(newWord) >= 2:
 
 			inLexicon = False
+
+			# if word already in lexicon, increase frequency
 			for index, each in enumerate(lexicon):
 				if newWord == each:
 					lexiconFrequency[index] += 1
@@ -40,11 +42,17 @@ def forEachUtterance(utterance, memory=[], lexicon=[], lexiconFrequency=[]):
 			
 			if not(inLexicon):
 				lexicon.append(newWord)
+				# accounts for first time word showed up and matched word
 				lexiconFrequency.append(2)
 				newWord = []
 
 		return newWord
 
+	# Adds monosyllabic words to lexicon
+	if len(utterance) == 1:
+		memory.append(utterance[0])
+		insertIntoLexicon(utterance[0])
+		return memory, lexicon, lexiconFrequency
 
 	memoryPointer = 0
 	for syllable in utterance:
