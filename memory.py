@@ -1,6 +1,8 @@
 ''' tests idea of heavy computation on limited memory '''
 
 #TODO: arrange lexicon by highest frequency first
+#TODO: if the word matches with a one syllable word in memory, it doesn't try to match more words in a latter part of memory...
+# maybe that's a good time to segment it?
 
 def shortTermMemory(memoryLength, utteranceArray):
 	'''
@@ -76,9 +78,6 @@ def forEachUtterance(utterance, memory=[], lexicon=[], lexiconFrequency=[]):
 		lexiconFrequency: a list of segmentations frequency
 	'''
 
-	#TODO: if the word matches with a one syllable word in memory, it doesn't try to match more words in a latter part of memory...
-	# maybe that's a good time to segment it?
-
 	# Adds monosyllabic words to lexicon
 	if len(utterance) == 1:
 		memory.append(utterance)
@@ -111,12 +110,13 @@ def forEachUtterance(utterance, memory=[], lexicon=[], lexiconFrequency=[]):
 			newWord, lexicon, lexiconFrequency = insertIntoLexicon(newWord, lexicon, lexiconFrequency)
 			inMemory = False
 		else:
+			# checks if the word has ended (is the syllable the last in the utterance)
 			if (len(memory[memUttPointer]) - 1) > memSyllPointer:
 				memSyllPointer += 1
 				isInMiddleOfSyllable = True
 			else:
-				isInMiddleOfSyllable = False
 				newWord, lexicon, lexiconFrequency = insertIntoLexicon(newWord, lexicon, lexiconFrequency)
+				isInMiddleOfSyllable = False
 
 			newWord.append(syllable)
 			tmpMemory.append(syllable)
@@ -126,6 +126,3 @@ def forEachUtterance(utterance, memory=[], lexicon=[], lexiconFrequency=[]):
 	memory.append(tmpMemory)
 			
 	return memory, lexicon, lexiconFrequency
-
-def rearranageByHighestFrequency(lexicon, lexiconFrequency):
-	pass
