@@ -2,7 +2,7 @@
 
 from helpers import *
 
-def accuracy(lexicon, lexiconFrequency):
+def accuracy(lexicon, lexiconFrequency, returnCount=False):
 	'''
 	Returns a list of incorrect words. Returns a list of correct words.
 
@@ -33,4 +33,6 @@ def accuracy(lexicon, lexiconFrequency):
 			incorrectlySegmented.append(word)
 			incorrectlySegmentedFrequency.append(lexiconFrequency[index])
 
+	if returnCount:
+		return len(correctlySegmented), len(incorrectlySegmented)
 	return correctlySegmented, correctlySegmentedFrequency, incorrectlySegmented, incorrectlySegmentedFrequency
