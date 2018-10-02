@@ -106,12 +106,7 @@ def forEachUtterance(utterance, memory=[], lexicon=[], lexiconFrequency=[], mono
 			checkMemoryResults = checkInMemory(memory, syllable)
 			inMemory = len(checkMemoryResults) != 0				
 
-		if not(inMemory):
-			memUttPointer = 0
-			memSyllPointer = 0
-			# this also resets newWord to []
-			newWord, lexicon, lexiconFrequency = tryInsertIntoLexicon(newWord, lexicon, lexiconFrequency)
-		else:
+		if inMemory:
 			memUttPointer = checkMemoryResults[0][0]
 			memSyllPointer = checkMemoryResults[0][1]
 				# TODO: here I want to run it for every occurance. CHECK ALL OUTPUTS OF CHECK MEMORY
@@ -127,6 +122,11 @@ def forEachUtterance(utterance, memory=[], lexicon=[], lexiconFrequency=[], mono
 				newWord, lexicon, lexiconFrequency = tryInsertIntoLexicon(newWord, lexicon, lexiconFrequency)
 				print("LEXICON", lexicon)
 				isInMiddleOfWord = False
+		else:
+			memUttPointer = 0
+			memSyllPointer = 0
+			# this also resets newWord to []
+			newWord, lexicon, lexiconFrequency = tryInsertIntoLexicon(newWord, lexicon, lexiconFrequency)
 
 
 	# at the end if newWord has not been added, add it
