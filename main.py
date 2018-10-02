@@ -38,4 +38,12 @@ if __name__ == '__main__':
 	# print(lexiconFrequency)
 
 	# test finite state grammar
-	print(FSG.finiteStateGrammar(utterances))
+	# results = FSG.finiteStateGrammar(utterances)
+
+	# for i in results:
+	# 	print(i)
+
+	# Statistics
+	finiteStateMachine = FSG.finiteStateGrammar(utterances)
+	with open('data/transitionalFrequencies.txt','a') as results:
+		results.write(str(finiteStateMachine))
