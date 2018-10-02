@@ -5,3 +5,4 @@ data/memoryFrequencies
 dump/*
 __pycache__
 logs/*
+*.pyc
