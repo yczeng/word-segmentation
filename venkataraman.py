@@ -6,7 +6,7 @@ import math
 lexicon = {}
 
 # this is probably just strings as keys and frequencies as values
-phonemes = {}
+phonemes = {'I': 0,'E': 0,'&': 0,'A': 0,'a': 0,'O': 0,'U': 0,'6': 0,'i': 0,'e': 0,'9': 0,'Q': 0,'u': 0,'o': 0,'7': 0,'3': 0,'R': 0,'#': 0,'%': 0,'*': 0,'(': 0,')': 0,'p': 0,'b': 0,'m': 0,'t': 0,'d': 0,'n': 0,'k': 0,'g': 0,'N': 0,'f': 0,'v': 0,'T': 0,'D': 0,'s': 0,'z': 0,'S': 0,'Z': 0,'h': 0,'c': 0,'G': 0,'l': 0,'r': 0,'L': 0,'~': 0,'M': 0,'y': 0,'w': 0,'W': 0}
 
 def evalUtterance(utterance):
 	n = len(utterance)
@@ -58,10 +58,7 @@ def evalWord(word):
 		else:
 			escape = len(lexicon) / len(lexicon) + sum(lexicon.values())
 
-		if '#' in phonemes:
-			P_0 = phonemes['#']
-		else:
-			P_0 = 0
+		P_0 = phonemes['#']
 
 		if escape == 0 and P_0 == 0:
 			score = 0
@@ -71,6 +68,7 @@ def evalWord(word):
 			except:
 				print(escape)
 				print(P_0 / 1-P_0)
+				print(lexicon)
 				exit()
 
 		if len(phonemes) != 0:
@@ -85,5 +83,6 @@ def evalWord(word):
 if __name__ == "__main__":
 	with open('Bernstein-Ratner87', "r") as text:
 		for line in text:
-			processedLine = line.replace('\n', '').split(' ')
+			processedLine = line.replace('\n', '').replace(" ", "")
+			print(processedLine)
 			evalUtterance(processedLine)
