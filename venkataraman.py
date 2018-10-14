@@ -6,18 +6,21 @@ import math
 lexicon = {}
 
 # this is probably just strings as keys and frequencies as values
-phonemes = {'I': 0,'E': 0,'&': 0,'A': 0,'a': 0,'O': 0,'U': 0,'6': 0,'i': 0,'e': 0,'9': 0,'Q': 0,'u': 0,'o': 0,'7': 0,'3': 0,'R': 0,'#': 0,'%': 0,'*': 0,'(': 0,')': 0,'p': 0,'b': 0,'m': 0,'t': 0,'d': 0,'n': 0,'k': 0,'g': 0,'N': 0,'f': 0,'v': 0,'T': 0,'D': 0,'s': 0,'z': 0,'S': 0,'Z': 0,'h': 0,'c': 0,'G': 0,'l': 0,'r': 0,'L': 0,'~': 0,'M': 0,'y': 0,'w': 0,'W': 0}
+phonemes = {'I': 1,'E': 1,'&': 1,'A': 1,'a': 1,'O': 1,'U': 1,'6': 1,'i': 1,'e': 1,'9': 1,'Q': 1,'u': 1,'o': 1,'7': 1,'3': 1,'R': 1,'#': 1,'%': 1,'*': 1,'(': 1,')': 1,'p': 1,'b': 1,'m': 1,'t': 1,'d': 1,'n': 1,'k': 1,'g': 1,'N': 1,'f': 1,'v': 1,'T': 1,'D': 1,'s': 1,'z': 1,'S': 1,'Z': 1,'h': 1,'c': 1,'G': 1,'l': 1,'r': 1,'L': 1,'~': 1,'M': 1,'y': 1,'w': 1,'W': 1}
 
 def evalUtterance(utterance):
 	n = len(utterance)
 
 	best_segment = n
-	bestCost = evalWord(tuple(utterance[0:n]))
+	bestCost = evalWord(utterance[0:n])
 	bestSegpoint = 0
-	for i in range(n):
+	for i in range(1, n):
+		print(i)
 		subUtterance = utterance[0:i]
+		print("SUBUTTERANCE", subUtterance)
 		word = utterance[i::]
-		cost = evalUtterance(subUtterance) + evalWord(tuple(word))
+		print("WORD", word)
+		cost = evalUtterance(subUtterance) + evalWord(word)
 		if cost < bestCost:
 			bestCost = cost
 			bestSegpoint = i
@@ -27,17 +30,19 @@ def evalUtterance(utterance):
 
 def insertWordBoundary(utterance, bestSegpoint):
 	# for inserting into word boundary
-	tupleWord = tuple(utterance[bestSegpoint::])
-	if tupleWord in lexicon:
-		lexicon[tupleWord] += 1
+	newWord = utterance[bestSegpoint::]
+	if newWord in lexicon:
+		lexicon[newWord] += 1
 	else:
-		lexicon[tupleWord] = 1
+		lexicon[newWord] = 1
 
-	for phoneme in tupleWord:
+	for phoneme in newWord:
+		print("PHONEME IS", phoneme)
 		if phoneme in phonemes:
 			phonemes[phoneme] += 1
 		else:
 			phonemes[phonemes] = 0
+	print(phonemes)
 
 
 def evalWord(word):
@@ -45,10 +50,11 @@ def evalWord(word):
 	Calculates a log score for word
 
 	Args:
-		word: word w[0..k] where w[i] are the phonemes in it. Word is a TUPLE
+		word: word w[0..k] where w[i] are the phonemes in it. Word is a string
 	Returns:
 
 	'''
+
 	score = 0
 	# implement lexicon with words and give frequencies. Maybe a dictionary
 	if word not in lexicon:
@@ -57,22 +63,18 @@ def evalWord(word):
 			escape = 0
 		else:
 			escape = len(lexicon) / len(lexicon) + sum(lexicon.values())
+			print("NEW ESCAPE IS", escape)
 
-		P_0 = phonemes['#']
+		# this makes no sense?!
+		P_0 = phonemes['#'] / sum(phonemes.values())
 
-		if escape == 0 and P_0 == 0:
+		if escape == 0:
 			score = 0
 		else:
-			try:
-				score = - math.log(escape) - math.log(P_0 / (1-P_0))
-			except:
-				print(escape)
-				print(P_0 / 1-P_0)
-				print(lexicon)
-				exit()
+			score = -math.log(escape) - math.log(P_0 / (1-P_0))
 
-		if len(phonemes) != 0:
-			for i in range(len(word)):
+		for i in range(len(word)):
+			if phonemes[word[i]] != 0:
 				score -= math.log(phonemes[word[i]])
 
 	else:
